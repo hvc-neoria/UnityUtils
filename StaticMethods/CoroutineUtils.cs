@@ -8,20 +8,14 @@ namespace HvcNeoria.Unity.Utils
     // 参考：https://12px.com/blog/2016/11/unity-delay/
     public static class CoroutineUtils
     {
-        static MonoBehaviour mono;
-
-        static CoroutineUtils()
-        {
-            mono = GameObject.FindObjectOfType<MonoBehaviour>();
-        }
-
         /// <summary>
         /// 指定時間後にactionを実行する。
         /// </summary>
+        /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
         /// <param name="action">アクション</param>
         /// <returns>コルーチン</returns>
-        public static Coroutine Delay(WaitForSeconds waitForSeconds, Action action)
+        public static Coroutine Delay(this MonoBehaviour mono, WaitForSeconds waitForSeconds, Action action)
         {
             return mono.StartCoroutine(DelayCoroutine(waitForSeconds, action));
         }
@@ -30,10 +24,11 @@ namespace HvcNeoria.Unity.Utils
         /// 指定時間後にactionを実行する。
         /// 呼び出す度にWaitForSecondsをインスタンス化する点に注意。
         /// </summary>
+        /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
         /// <param name="action">アクション</param>
         /// <returns>コルーチン</returns>
-        public static Coroutine Delay(float waitForSeconds, Action action)
+        public static Coroutine Delay(this MonoBehaviour mono, float waitForSeconds, Action action)
         {
             return mono.StartCoroutine(DelayCoroutine(new WaitForSeconds(waitForSeconds), action));
         }
@@ -41,9 +36,10 @@ namespace HvcNeoria.Unity.Utils
         /// <summary>
         /// 1フレーム後にactionを実行する。
         /// </summary>
+        /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="action">アクション</param>
         /// <returns>コルーチン</returns>
-        public static Coroutine Delay1Frame(Action action)
+        public static Coroutine Delay1Frame(this MonoBehaviour mono, Action action)
         {
             return mono.StartCoroutine(Delay1FrameCoroutine(action));
         }
@@ -52,25 +48,27 @@ namespace HvcNeoria.Unity.Utils
         /// 指定した時間間隔でactionを実行する。
         /// 最初のactionは本メソッド実行時。
         /// </summary>
+        /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="intervalTime">繰り返しの時間間隔</param>
         /// <param name="action">アクション</param>
         /// <param name="timeToExecuteLastAction">最後のアクションを実行するまでの時間</param>
         /// <returns>コルーチン</returns>
-        public static Coroutine Loop(WaitForSeconds intervalTime, Action action, float timeToExecuteLastAction = Mathf.Infinity)
+        public static Coroutine Loop(this MonoBehaviour mono, WaitForSeconds intervalTime, Action action, float timeToExecuteLastAction = Mathf.Infinity)
         {
             action();
-            return LoopWhoseFirstActionIsAfterInterval(intervalTime, action, timeToExecuteLastAction);
+            return mono.LoopWhoseFirstActionIsAfterInterval(intervalTime, action, timeToExecuteLastAction);
         }
 
         /// <summary>
         /// 指定した時間間隔でactionを実行する。
         /// 最初のactionはintervalTime後に実行する。
         /// </summary>
+        /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="intervalTime">繰り返しの時間間隔</param>
         /// <param name="action">アクション</param>
         /// <param name="timeToExecuteLastAction">最後のアクションを実行するまでの時間</param>
         /// <returns>コルーチン</returns>
-        public static Coroutine LoopWhoseFirstActionIsAfterInterval(WaitForSeconds intervalTime, Action action, float timeToExecuteLastAction = Mathf.Infinity)
+        public static Coroutine LoopWhoseFirstActionIsAfterInterval(this MonoBehaviour mono, WaitForSeconds intervalTime, Action action, float timeToExecuteLastAction = Mathf.Infinity)
         {
             return mono.StartCoroutine(LoopCoroutine(intervalTime, action, timeToExecuteLastAction));
         }
