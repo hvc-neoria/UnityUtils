@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 namespace HvcNeoria.Unity.Utils
 {
@@ -42,16 +43,53 @@ namespace HvcNeoria.Unity.Utils
         /// <returns>文字列の2次元配列</returns>
         public static string[][] ToStrings(this TextAsset csvFile)
         {
-            StringReader reader = new StringReader(csvFile.text);
+            var csvDatas = new List<string[]>();
 
-            List<string[]> csvDatas = new List<string[]>();
-            while (reader.Peek() != -1) // reader.Peekが-1になるまで
+            using (var reader = new StringReader(csvFile.text))
             {
-                string line = reader.ReadLine(); // 一行ずつ読み込み
-                csvDatas.Add(line.Split(',')); // カンマ（,）区切りでリストに追加
+                // 次の文字がなくなるまで繰り返す
+                while (reader.Peek() != -1)
+                {
+                    string line = reader.ReadLine();
+                    string[] strings = line.Split(',');
+                    csvDatas.Add(strings);
+                }
             }
-            string[][] result = csvDatas.ToArray();
-            return result;
+
+            return csvDatas.ToArray();
+        }
+
+        /// <summary>
+        /// CSVをDictionaryの配列に変換する。
+        /// 1行目の値がキーとなる。
+        /// </summary>
+        /// <param name="csvFile">CSVファイル</param>
+        /// <returns>Dictionaryの配列</returns>
+        public static Dictionary<string, string>[] ToDictionaries(this TextAsset csvFile)
+        {
+            var csvDatas = new List<Dictionary<string, string>>();
+            string[] keys = null;
+
+            using (var reader = new StringReader(csvFile.text))
+            {
+                // 次の文字がなくなるまで繰り返す
+                while (reader.Peek() != -1)
+                {
+                    string line = reader.ReadLine();
+                    string[] strings = line.Split(',');
+
+                    if (keys == null)
+                    {
+                        keys = strings;
+                        continue;
+                    }
+
+                    var dictionary = Enumerable.Range(0, keys.Length).ToDictionary(i => keys[i], i => strings[i]);
+                    csvDatas.Add(dictionary);
+                }
+            }
+
+            return csvDatas.ToArray();
         }
 
         /// <summary>
