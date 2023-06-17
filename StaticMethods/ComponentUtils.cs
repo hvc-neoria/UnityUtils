@@ -8,7 +8,6 @@ namespace HvcNeoria.Unity.Utils
 {
     public static class ComponentUtils
     {
-
         /// <summary>
         /// コンポーネント取得失敗時に例外を出力するGetComponent。
         /// </summary>
@@ -23,7 +22,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}は、{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
             }
             return result;
         }
@@ -42,7 +41,83 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}は、{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// コンポーネント取得失敗時に例外を出力するGetComponentInChildren。
+        /// </summary>
+        /// <param name="target">コンポーネントの取得先</param>
+        /// <typeparam name="TComponent">取得するコンポーネントの型</typeparam>
+        /// <returns>コンポーネント</returns>
+        public static TComponent RequireComponentInChildren<TComponent>(this Component target) where TComponent : Component
+        {
+            TComponent result = target.GetComponentInChildren<TComponent>();
+            // ジェネリックの比較の際は、Unityによってオーバーロードされた==を使えず、
+            // いわゆる「偽装null」をnullとして判定してくれない。
+            // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
+            if ((UnityEngine.Object)result == null)
+            {
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// コンポーネント取得失敗時に例外を出力するGetComponentInChildren。
+        /// </summary>
+        /// <param name="target">コンポーネントの取得先</param>
+        /// <typeparam name="TComponent">取得するコンポーネントの型</typeparam>
+        /// <returns>コンポーネント</returns>
+        public static TComponent RequireComponentInChildren<TComponent>(this GameObject target) where TComponent : Component
+        {
+            TComponent result = target.GetComponentInChildren<TComponent>();
+            // ジェネリックの比較の際は、Unityによってオーバーロードされた==を使えず、
+            // いわゆる「偽装null」をnullとして判定してくれない。
+            // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
+            if ((UnityEngine.Object)result == null)
+            {
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// コンポーネント取得失敗時に例外を出力するGetComponentInParent。
+        /// </summary>
+        /// <param name="target">コンポーネントの取得先</param>
+        /// <typeparam name="TComponent">取得するコンポーネントの型</typeparam>
+        /// <returns>コンポーネント</returns>
+        public static TComponent RequireComponentInParent<TComponent>(this Component target) where TComponent : Component
+        {
+            TComponent result = target.GetComponentInParent<TComponent>();
+            // ジェネリックの比較の際は、Unityによってオーバーロードされた==を使えず、
+            // いわゆる「偽装null」をnullとして判定してくれない。
+            // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
+            if ((UnityEngine.Object)result == null)
+            {
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// コンポーネント取得失敗時に例外を出力するGetComponentInParent。
+        /// </summary>
+        /// <param name="target">コンポーネントの取得先</param>
+        /// <typeparam name="TComponent">取得するコンポーネントの型</typeparam>
+        /// <returns>コンポーネント</returns>
+        public static TComponent RequireComponentInParent<TComponent>(this GameObject target) where TComponent : Component
+        {
+            TComponent result = target.GetComponentInParent<TComponent>();
+            // ジェネリックの比較の際は、Unityによってオーバーロードされた==を使えず、
+            // いわゆる「偽装null」をnullとして判定してくれない。
+            // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
+            if ((UnityEngine.Object)result == null)
+            {
+                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
             }
             return result;
         }
