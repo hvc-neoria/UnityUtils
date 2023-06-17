@@ -5,6 +5,8 @@ namespace HvcNeoria.Unity.Utils
 {
     public static class SceneUtils
     {
+        static string SceneLoadingInSingle;
+
         public static int ActiveSceneBuildIndex => SceneManager.GetActiveScene().buildIndex;
 
         /// <summary>
@@ -17,9 +19,22 @@ namespace HvcNeoria.Unity.Utils
         /// <param name="mode">シーンの読み込みモード</param>
         public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, int sceneBuildIndex, LoadSceneMode mode = LoadSceneMode.Single)
         {
-            AsyncOperation a = SceneManager.LoadSceneAsync(sceneBuildIndex, mode);
-            a.allowSceneActivation = false;
-            mono.Delay(waitForSeconds, () => a.allowSceneActivation = true);
+            if (SceneLoadingInSingle != null)
+            {
+                Debug.LogWarning(SceneLoadingInSingle + "をシングルモードでロード中のため、追加でシーンをロードしません。");
+                return;
+            }
+
+            if (mode == LoadSceneMode.Single) SceneLoadingInSingle = SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name;
+
+            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneBuildIndex, mode);
+            asyncOperation.allowSceneActivation = false;
+
+            mono.Delay(waitForSeconds, () =>
+            {
+                SceneLoadingInSingle = null;
+                asyncOperation.allowSceneActivation = true;
+            });
         }
 
         /// <summary>
@@ -32,9 +47,22 @@ namespace HvcNeoria.Unity.Utils
         /// <param name="mode">シーンの読み込みモード</param>
         public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
         {
-            AsyncOperation a = SceneManager.LoadSceneAsync(sceneName, mode);
-            a.allowSceneActivation = false;
-            mono.Delay(waitForSeconds, () => a.allowSceneActivation = true);
+            if (SceneLoadingInSingle != null)
+            {
+                Debug.LogWarning(SceneLoadingInSingle + "をシングルモードでロード中のため、追加でシーンをロードしません。");
+                return;
+            }
+
+            if (mode == LoadSceneMode.Single) SceneLoadingInSingle = sceneName;
+
+            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName, mode);
+            asyncOperation.allowSceneActivation = false;
+
+            mono.Delay(waitForSeconds, () =>
+            {
+                SceneLoadingInSingle = null;
+                asyncOperation.allowSceneActivation = true;
+            });
         }
 
         /// <summary>
