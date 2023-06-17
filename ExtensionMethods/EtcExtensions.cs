@@ -111,8 +111,9 @@ namespace HvcNeoria.Unity.Utils
         /// <returns>カラー</returns>
         public static Color ToColor(this string colorCode)
         {
-            string colorCodeAddedSharp = colorCode;
-            if (colorCodeAddedSharp[0] != '#') colorCodeAddedSharp = '#' + colorCodeAddedSharp;
+            string colorCodeAddedSharp = "";
+            if (colorCode[0] != '#') colorCodeAddedSharp = "#";
+            colorCodeAddedSharp += colorCode;
 
             Color result;
             if (ColorUtility.TryParseHtmlString(colorCodeAddedSharp, out result))
