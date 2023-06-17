@@ -9,9 +9,7 @@ namespace HvcNeoria.Unity.Utils
     public static class EtcExtensions
     {
         /// <summary>
-        /// 反射ベクトル。
-        /// 返り値のベクトルの始点を、衝突元のコライダーの中心とすると、
-        /// 衝突元のコライダーの軌道予測線となる。
+        /// 反射ベクトル。コリジョンに衝突した後の軌道。
         /// </summary>
         /// <param name="targetCollision">衝突先のコリジョン</param>
         /// <returns>反射ベクトル</returns>
@@ -30,8 +28,7 @@ namespace HvcNeoria.Unity.Utils
         /// <returns>Vector3の配列</returns>
         public static Vector3[] GetPositions(this LineRenderer lineRenderer)
         {
-            var positions = new Vector3[lineRenderer.positionCount];
-            // positionsに値が返されるのだが、outの記載が不要なため紛らわしい。
+            Vector3[] positions = new Vector3[lineRenderer.positionCount];
             lineRenderer.GetPositions(positions);
             return positions;
         }
@@ -61,7 +58,7 @@ namespace HvcNeoria.Unity.Utils
 
         /// <summary>
         /// CSVをDictionaryの配列に変換する。
-        /// 1行目の値がキーとなる。
+        /// CSVで1行目の値がキーとなる。
         /// </summary>
         /// <param name="csvFile">CSVファイル</param>
         /// <returns>Dictionaryの配列</returns>

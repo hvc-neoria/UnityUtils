@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
-    // Unityはデフォルトでは垂直同期しているので、
-    // PC上ではフレームレートが144に達してもおかしくない。
+    /// <summary>
+    /// Unityはデフォルトでは垂直同期しているので、
+    /// PC上ではフレームレートが144に達してもおかしくない。
+    /// </summary>
     public class FPSCounter : MonoBehaviour
     {
         [SerializeField]
