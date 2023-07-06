@@ -66,12 +66,14 @@ namespace HvcNeoria.Unity.Utils
         /// <summary>
         /// フェード用のキャンバスを作成する。
         /// </summary>
+        /// <param name="sortingOrder">ソート順</param>
         /// <returns>キャンバスコンポーネント</returns>
-        static Canvas CreateCanvas()
+        static Canvas CreateCanvas(int sortingOrder = 1)
         {
             GameObject canvasObj = new GameObject("FadeCanvas");
             Canvas canvas = canvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = sortingOrder;
             canvasObj.AddComponent<CanvasScaler>();
             canvasObj.AddComponent<GraphicRaycaster>();
             return canvas;
