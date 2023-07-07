@@ -19,9 +19,9 @@ namespace HvcNeoria.Unity.Utils
         /// <param name="mode">シーンの読み込みモード</param>
         public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, int sceneBuildIndex, LoadSceneMode mode = LoadSceneMode.Single)
         {
-            if (SceneLoadingInSingle != null)
+            if (SceneLoadingInSingle != null && mode == LoadSceneMode.Single)
             {
-                Debug.LogWarning(SceneLoadingInSingle + "をシングルモードでロード中のため、追加でシーンをロードしません。");
+                Debug.LogWarning("シングルモードでシーンロード中に、追加でシングルモードでシーンロードしません。\n一方のシーンがアクティブ化しないまま残り続けるためです。");
                 return;
             }
 
@@ -47,9 +47,9 @@ namespace HvcNeoria.Unity.Utils
         /// <param name="mode">シーンの読み込みモード</param>
         public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
         {
-            if (SceneLoadingInSingle != null)
+            if (SceneLoadingInSingle != null && mode == LoadSceneMode.Single)
             {
-                Debug.LogWarning(SceneLoadingInSingle + "をシングルモードでロード中のため、追加でシーンをロードしません。");
+                Debug.LogWarning("シングルモードでシーンロード中に、追加でシングルモードでシーンロードしません。\n一方のシーンがアクティブ化しないまま残り続けるためです。");
                 return;
             }
 
