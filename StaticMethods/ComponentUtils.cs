@@ -22,7 +22,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
@@ -41,7 +41,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
@@ -60,7 +60,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
@@ -79,7 +79,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
@@ -98,7 +98,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
@@ -117,7 +117,7 @@ namespace HvcNeoria.Unity.Utils
             // そのため、UnityEngine.Object型にキャストすることで、nullチェックを実現する。
             if ((UnityEngine.Object)result == null)
             {
-                throw new MissingComponentForExtensionException($"{target}から{result.GetType()}を取得できませんでした。{target}に、{result.GetType()}を追加してください。");
+                throw new MissingComponentForExtensionException($"{target}から{typeof(TComponent)}を取得できませんでした。");
             }
             return result;
         }
