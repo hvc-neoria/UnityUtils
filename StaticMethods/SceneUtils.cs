@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 
 namespace HvcNeoria.Unity.Utils
 {
@@ -75,6 +76,22 @@ namespace HvcNeoria.Unity.Utils
             int lastIndex = SceneManager.sceneCountInBuildSettings - 1;
             int index = currentIndex >= lastIndex ? 0 : currentIndex + 1;
             return index;
+        }
+
+        /// <summary>
+        /// 次回のシーンロード完了時にアクションを実行します。
+        /// シーン間のデータ共有に使用できます。
+        /// </summary>
+        /// <param name="action">実行するアクション</param>
+        public static void OnSceneLoadedForNextTime(Action action)
+        {
+            SceneManager.sceneLoaded += DoOnce;
+
+            void DoOnce(Scene scene, LoadSceneMode mode)
+            {
+                SceneManager.sceneLoaded -= DoOnce;
+                action();
+            }
         }
     }
 }
