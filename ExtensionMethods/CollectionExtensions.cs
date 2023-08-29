@@ -22,7 +22,7 @@ namespace HvcNeoria.Unity.Utils
         {
             var array = iEnumerable.ToArray();
 
-            for (int i = 0; i < array.Length - 2; i++)
+            for (int i = 0; i < array.Length - 1; i++)
             {
                 var j = Random.Range(i, array.Length);
 
