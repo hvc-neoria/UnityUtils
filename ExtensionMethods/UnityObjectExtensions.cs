@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace HvcNeoria.Unity.Utils
 {
-    public static class UnityObjectEditorExtensions
+    public static class UnityObjectExtensions
     {
         /// <summary>
         /// 指定したUnityEngine.Objectのサブアセットを取得する。
