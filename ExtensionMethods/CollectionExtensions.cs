@@ -82,8 +82,8 @@ namespace HvcNeoria.Unity.Utils
         /// </summary>
         /// <param name="iEnumerable">コレクション</param>
         /// <typeparam name="T">コレクションの要素の型</typeparam>
-        /// <returns>無加工のコレクション</returns>
-        public static IEnumerable<T> DebugLog<T>(this IEnumerable<T> iEnumerable)
+        /// <returns>コレクション</returns>
+        public static IEnumerable<T> DebugLogIEnumerable<T>(this IEnumerable<T> iEnumerable)
         {
             Debug.Log(string.Join(", ", iEnumerable));
             return iEnumerable;
