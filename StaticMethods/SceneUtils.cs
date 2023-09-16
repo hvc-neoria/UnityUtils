@@ -1,6 +1,7 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
 
 namespace HvcNeoria.Unity.Utils
 {
@@ -15,63 +16,71 @@ namespace HvcNeoria.Unity.Utils
         /// </summary>
         public static int PreviouslyLoadedSceneIndex { get; private set; }
 
-        static string SceneLoadingInSingle;
+        static bool IsLoadingSceneInSingleMode { get; set; }
 
         /// <summary>
         /// 指定した待ち時間中にシーンを事前ロードし、待ち時間経過後にシーンをアクティブ化します。
-        /// 待ち時間が経過してもロードが完了しない場合は、ロード完了後にシーンがアクティブ化されます。
         /// </summary>
+        /// <remarks>
+        /// 待ち時間が経過してもロードが完了しない場合は、ロード完了後にシーンがアクティブ化されます。
+        /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="sceneBuildIndex">シーンのビルドインデックス</param>
-        /// <param name="mode">シーンの読み込みモード</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, int sceneBuildIndex, LoadSceneMode mode = LoadSceneMode.Single)
+        /// <param name="singleSceneName">シングルモードでロードするシーン名</param>
+        /// <param name="additiveSceneNames">アディティブモードでロードするシーン名</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, string singleSceneName, params string[] additiveSceneNames)
         {
-            if (SceneLoadingInSingle != null && mode == LoadSceneMode.Single)
+            int singleSceneBuildIndex = SceneManager.GetSceneByName(singleSceneName).buildIndex;
+
+            int[] additiveSceneBuildIndexes = new int[additiveSceneNames.Length];
+            for (int i = 0; i < additiveSceneNames.Length; i++)
             {
-                Debug.LogWarning("シングルモードでシーンロード中に、追加でシングルモードでシーンロードしません。\n一方のシーンがアクティブ化しないまま残り続けるためです。");
-                return;
+                additiveSceneBuildIndexes[i] = SceneManager.GetSceneByName(additiveSceneNames[i]).buildIndex;
             }
 
-            if (mode == LoadSceneMode.Single) SceneLoadingInSingle = SceneManager.GetSceneByBuildIndex(sceneBuildIndex).name;
-
-            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneBuildIndex, mode);
-            asyncOperation.allowSceneActivation = false;
-
-            mono.Delay(waitForSeconds, () =>
-            {
-                SceneLoadingInSingle = null;
-                if (mode == LoadSceneMode.Single) PreviouslyLoadedSceneIndex = ActiveSceneBuildIndex;
-                asyncOperation.allowSceneActivation = true;
-            });
+            mono.ActivateSceneAfter(waitForSeconds, singleSceneBuildIndex, additiveSceneBuildIndexes);
         }
 
         /// <summary>
         /// 指定した待ち時間中にシーンを事前ロードし、待ち時間経過後にシーンをアクティブ化します。
-        /// 待ち時間が経過してもロードが完了しない場合は、ロード完了後にシーンがアクティブ化されます。
         /// </summary>
+        /// <remarks>
+        /// 待ち時間が経過してもロードが完了しない場合は、ロード完了後にシーンがアクティブ化されます。
+        /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="sceneName">シーン名</param>
-        /// <param name="mode">シーンの読み込みモード</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, WaitForSeconds waitForSeconds, string sceneName, LoadSceneMode mode = LoadSceneMode.Single)
+        /// <param name="singleSceneBuildIndex">シングルモードでロードするシーンのビルドインデックス</param>
+        /// <param name="additiveSceneBuildIndexes">アディティブモードでロードするシーンのビルドインデックス</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, int singleSceneBuildIndex, params int[] additiveSceneBuildIndexes)
         {
-            if (SceneLoadingInSingle != null && mode == LoadSceneMode.Single)
+            if (IsLoadingSceneInSingleMode)
             {
-                Debug.LogWarning("シングルモードでシーンロード中に、追加でシングルモードでシーンロードしません。\n一方のシーンがアクティブ化しないまま残り続けるためです。");
+                Debug.LogWarning("シングルモードでのシーンロード中に、追加でシーンロードしません。\n追加シーンがアクティブ化しないまま残り続けてしまうためです。");
                 return;
             }
 
-            if (mode == LoadSceneMode.Single) SceneLoadingInSingle = sceneName;
+            AsyncOperation singleSceneOperation = SceneManager.LoadSceneAsync(singleSceneBuildIndex, LoadSceneMode.Single);
+            singleSceneOperation.allowSceneActivation = false;
+            IsLoadingSceneInSingleMode = true;
 
-            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName, mode);
-            asyncOperation.allowSceneActivation = false;
+            List<AsyncOperation> additiveSceneOperations = new List<AsyncOperation>(additiveSceneBuildIndexes.Length);
+            foreach (int buildIndex in additiveSceneBuildIndexes)
+            {
+                AsyncOperation additiveSceneOperation = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive);
+                additiveSceneOperation.allowSceneActivation = false;
+                additiveSceneOperations.Add(additiveSceneOperation);
+            }
 
             mono.Delay(waitForSeconds, () =>
             {
-                SceneLoadingInSingle = null;
-                if (mode == LoadSceneMode.Single) PreviouslyLoadedSceneIndex = ActiveSceneBuildIndex;
-                asyncOperation.allowSceneActivation = true;
+                PreviouslyLoadedSceneIndex = ActiveSceneBuildIndex;
+                singleSceneOperation.allowSceneActivation = true;
+                IsLoadingSceneInSingleMode = false;
+
+                foreach (var asyncOperation in additiveSceneOperations)
+                {
+                    asyncOperation.allowSceneActivation = true;
+                }
             });
         }
 
