@@ -6,9 +6,16 @@ namespace HvcNeoria.Unity.Utils
 {
     public static class SceneUtils
     {
-        static string SceneLoadingInSingle;
-
         public static int ActiveSceneBuildIndex => SceneManager.GetActiveScene().buildIndex;
+
+        /// <summary>
+        /// 前回ロードしたシーンのビルドインデックスを取得します。
+        /// 本クラスのメソッドを使用してシーンをロードした場合のみ、値が設定されます。
+        /// Additiveモードでロードしたシーンは対象外です。
+        /// </summary>
+        public static int PreviouslyLoadedSceneIndex { get; private set; }
+
+        static string SceneLoadingInSingle;
 
         /// <summary>
         /// 指定した待ち時間中にシーンを事前ロードし、待ち時間経過後にシーンをアクティブ化します。
@@ -34,6 +41,7 @@ namespace HvcNeoria.Unity.Utils
             mono.Delay(waitForSeconds, () =>
             {
                 SceneLoadingInSingle = null;
+                if (mode == LoadSceneMode.Single) PreviouslyLoadedSceneIndex = ActiveSceneBuildIndex;
                 asyncOperation.allowSceneActivation = true;
             });
         }
@@ -62,6 +70,7 @@ namespace HvcNeoria.Unity.Utils
             mono.Delay(waitForSeconds, () =>
             {
                 SceneLoadingInSingle = null;
+                if (mode == LoadSceneMode.Single) PreviouslyLoadedSceneIndex = ActiveSceneBuildIndex;
                 asyncOperation.allowSceneActivation = true;
             });
         }
