@@ -26,19 +26,11 @@ namespace HvcNeoria.Unity.Utils
         /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="singleSceneName">シングルモードでロードするシーン名</param>
-        /// <param name="additiveSceneNames">アディティブモードでロードするシーン名</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, string singleSceneName, params string[] additiveSceneNames)
+        /// <param name="singleSceneBuildIndex">シングルモードでロードするシーンのビルドインデックス</param>
+        /// <param name="additiveSceneBuildIndexes">アディティブモードでロードするシーンのビルドインデックス</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, int singleSceneIndex, params int[] additiveSceneIndexes)
         {
-            int singleSceneBuildIndex = SceneManager.GetSceneByName(singleSceneName).buildIndex;
-
-            int[] additiveSceneBuildIndexes = new int[additiveSceneNames.Length];
-            for (int i = 0; i < additiveSceneNames.Length; i++)
-            {
-                additiveSceneBuildIndexes[i] = SceneManager.GetSceneByName(additiveSceneNames[i]).buildIndex;
-            }
-
-            mono.ActivateSceneAfter(waitForSeconds, singleSceneBuildIndex, additiveSceneBuildIndexes);
+            mono.ActivateSceneAfter(waitForSeconds, () => SceneManager.LoadSceneAsync(singleSceneIndex, LoadSceneMode.Single), () => GetAdditiveSceneOperations(additiveSceneIndexes));
         }
 
         /// <summary>
@@ -49,9 +41,34 @@ namespace HvcNeoria.Unity.Utils
         /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="singleSceneBuildIndex">シングルモードでロードするシーンのビルドインデックス</param>
-        /// <param name="additiveSceneBuildIndexes">アディティブモードでロードするシーンのビルドインデックス</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, int singleSceneBuildIndex, params int[] additiveSceneBuildIndexes)
+        /// <param name="singleSceneName">シングルモードでロードするシーン名</param>
+        /// <param name="additiveSceneNames">アディティブモードでロードするシーン名</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, string singleSceneName, params string[] additiveSceneNames)
+        {
+            mono.ActivateSceneAfter(waitForSeconds, () => SceneManager.LoadSceneAsync(singleSceneName, LoadSceneMode.Single), () => GetAdditiveSceneOperations(additiveSceneNames));
+        }
+
+        static AsyncOperation[] GetAdditiveSceneOperations(int[] additiveSceneIndex)
+        {
+            AsyncOperation[] additiveSceneOperations = new AsyncOperation[additiveSceneIndex.Length];
+            for (int i = 0; i < additiveSceneIndex.Length; i++)
+            {
+                additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveSceneIndex[i], LoadSceneMode.Additive);
+            }
+            return additiveSceneOperations;
+        }
+
+        static AsyncOperation[] GetAdditiveSceneOperations(string[] additiveSceneNames)
+        {
+                AsyncOperation[] additiveSceneOperations = new AsyncOperation[additiveSceneNames.Length];
+                for (int i = 0; i < additiveSceneNames.Length; i++)
+                {
+                    additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveSceneNames[i], LoadSceneMode.Additive);
+                }
+                return additiveSceneOperations;
+        }
+
+        static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, Func<AsyncOperation> getSingleSceneOperation, Func<AsyncOperation[]> getAdditiveSceneOperations)
         {
             if (IsLoadingSceneInSingleMode)
             {
@@ -59,17 +76,11 @@ namespace HvcNeoria.Unity.Utils
                 return;
             }
 
-            AsyncOperation singleSceneOperation = SceneManager.LoadSceneAsync(singleSceneBuildIndex, LoadSceneMode.Single);
+            AsyncOperation singleSceneOperation = getSingleSceneOperation();
             singleSceneOperation.allowSceneActivation = false;
             IsLoadingSceneInSingleMode = true;
 
-            List<AsyncOperation> additiveSceneOperations = new List<AsyncOperation>(additiveSceneBuildIndexes.Length);
-            foreach (int buildIndex in additiveSceneBuildIndexes)
-            {
-                AsyncOperation additiveSceneOperation = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive);
-                additiveSceneOperation.allowSceneActivation = false;
-                additiveSceneOperations.Add(additiveSceneOperation);
-            }
+            AsyncOperation[] additiveSceneOperations = getAdditiveSceneOperations();
 
             mono.Delay(waitForSeconds, () =>
             {
