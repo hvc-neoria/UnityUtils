@@ -17,8 +17,8 @@ namespace HvcNeoria.Unity.Utils
         /// </summary>
         /// <param name="iEnumerable">コレクション</param>
         /// <typeparam name="T">コレクションの要素の型</typeparam>
-        /// <returns>シャッフルされた配列</returns>
-        public static T[] Shuffle<T>(this IEnumerable<T> iEnumerable)
+        /// <returns>シャッフルされたコレクション</returns>
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> iEnumerable)
         {
             var array = iEnumerable.ToArray();
 
@@ -41,8 +41,8 @@ namespace HvcNeoria.Unity.Utils
         /// ほぼ同じ値であることを判定するMathf.Approximately()を使用している。
         /// </summary>
         /// <param name="floats">floatのIEnumerable</param>
-        /// <returns>重複削除されたfloatのList</returns>
-        public static List<float> Distinct(this IEnumerable<float> floats)
+        /// <returns>重複削除されたfloatのfloatのIEnumerable</returns>
+        public static IEnumerable<float> Distinct(this IEnumerable<float> floats)
         {
             var result = new List<float>();
 
