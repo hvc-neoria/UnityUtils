@@ -5,6 +5,7 @@ namespace HvcNeoria.Unity.Utils
 {
     public static class UnityObjectExtensions
     {
+#if UNITY_EDITOR
         /// <summary>
         /// 指定したUnityEngine.Objectのサブアセットを取得する。
         /// </summary>
@@ -16,5 +17,6 @@ namespace HvcNeoria.Unity.Utils
             var assets = AssetDatabase.LoadAllAssetsAtPath(path);
             return assets.Where(x => AssetDatabase.IsSubAsset(x)).ToArray();
         }
+#endif
     }
 }
