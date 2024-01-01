@@ -76,9 +76,9 @@ namespace HvcNeoria.Unity.Utils
                 return;
             }
 
+            IsLoadingSceneInSingleMode = true;
             AsyncOperation singleSceneOperation = getSingleSceneOperation();
             singleSceneOperation.allowSceneActivation = false;
-            IsLoadingSceneInSingleMode = true;
 
             AsyncOperation[] additiveSceneOperations = getAdditiveSceneOperations();
 
