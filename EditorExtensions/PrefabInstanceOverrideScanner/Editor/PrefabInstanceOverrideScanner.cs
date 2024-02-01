@@ -5,6 +5,9 @@ using UnityEditor;
 
 namespace HvcNeoria.Unity.Utils
 {
+    /// <summary>
+    /// プレハブインスタンスのオーバーライドを走査するクラス
+    /// </summary>
     public class PrefabInstanceOverrideScanner : MonoBehaviour
     {
         [MenuItem("Tools/Prefab Instance Override Scan")]
