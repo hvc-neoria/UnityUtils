@@ -7,15 +7,21 @@ namespace HvcNeoria.Unity.Utils
 {
     public static class SceneUtils
     {
+        /// <summary>
+        /// アクティブシーンのビルドインデックスを取得します。
+        /// </summary>
+        /// <returns></returns>
         public static int ActiveSceneBuildIndex => SceneManager.GetActiveScene().buildIndex;
 
         /// <summary>
-        /// 前回ロードしたシーンのビルドインデックスを取得します。
-        /// 本クラスのメソッドを使用してシーンをロードした場合のみ、値が設定されます。
-        /// Additiveモードでロードしたシーンは対象外です。
+        /// 前回シングルモードでロードしたシーンのビルドインデックスを取得します。
+        /// ※本クラスのメソッドを使用してシーンをロードした場合のみ、値が設定されます。
         /// </summary>
         public static int PreviouslyLoadedSceneIndex { get; private set; }
 
+        /// <summary>
+        /// シングルモードでシーンをロード中かどうかを取得します。
+        /// </summary>
         static bool IsLoadingSceneInSingleMode { get; set; }
 
         /// <summary>
@@ -26,11 +32,30 @@ namespace HvcNeoria.Unity.Utils
         /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="singleSceneBuildIndex">シングルモードでロードするシーンのビルドインデックス</param>
-        /// <param name="additiveSceneBuildIndexes">アディティブモードでロードするシーンのビルドインデックス</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, int singleSceneIndex, params int[] additiveSceneIndexes)
+        /// <param name="singleScene">シングルモードでロードするシーン</param>
+        /// <param name="additiveScenes">アディティブモードでロードするシーン</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, Scene singleScene, params Scene[] additiveScenes)
         {
-            mono.ActivateSceneAfter(waitForSeconds, () => SceneManager.LoadSceneAsync(singleSceneIndex, LoadSceneMode.Single), () => GetAdditiveSceneOperations(additiveSceneIndexes));
+            mono.ActivateSceneAfter(
+                waitForSeconds,
+                () => SceneManager.LoadSceneAsync(singleScene.buildIndex, LoadSceneMode.Single),
+                () => GetAdditiveSceneOperations(additiveScenes)
+            );
+        }
+
+        /// <summary>
+        /// ロードシーンモードがアディティブな複数のシーンをロードします。
+        /// </summary>
+        /// <param name="additiveScenes">アディティブシーン</param>
+        /// <returns>AsyncOperation配列</returns>
+        static AsyncOperation[] GetAdditiveSceneOperations(Scene[] additiveScenes)
+        {
+            var additiveSceneOperations = new AsyncOperation[additiveScenes.Length];
+            for (int i = 0; i < additiveScenes.Length; i++)
+            {
+                additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveScenes[i].buildIndex, LoadSceneMode.Additive);
+            }
+            return additiveSceneOperations;
         }
 
         /// <summary>
@@ -41,34 +66,9 @@ namespace HvcNeoria.Unity.Utils
         /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="singleSceneName">シングルモードでロードするシーン名</param>
-        /// <param name="additiveSceneNames">アディティブモードでロードするシーン名</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, string singleSceneName, params string[] additiveSceneNames)
-        {
-            mono.ActivateSceneAfter(waitForSeconds, () => SceneManager.LoadSceneAsync(singleSceneName, LoadSceneMode.Single), () => GetAdditiveSceneOperations(additiveSceneNames));
-        }
-
-        static AsyncOperation[] GetAdditiveSceneOperations(int[] additiveSceneIndex)
-        {
-            AsyncOperation[] additiveSceneOperations = new AsyncOperation[additiveSceneIndex.Length];
-            for (int i = 0; i < additiveSceneIndex.Length; i++)
-            {
-                additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveSceneIndex[i], LoadSceneMode.Additive);
-            }
-            return additiveSceneOperations;
-        }
-
-        static AsyncOperation[] GetAdditiveSceneOperations(string[] additiveSceneNames)
-        {
-                AsyncOperation[] additiveSceneOperations = new AsyncOperation[additiveSceneNames.Length];
-                for (int i = 0; i < additiveSceneNames.Length; i++)
-                {
-                    additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveSceneNames[i], LoadSceneMode.Additive);
-                }
-                return additiveSceneOperations;
-        }
-
-        static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, Func<AsyncOperation> getSingleSceneOperation, Func<AsyncOperation[]> getAdditiveSceneOperations)
+        /// <param name="loadSingleSceneAsyncMethod">非同期かつシングルでシーンをロードするメソッド</param>
+        /// <param name="loadAdditiveSceneAsyncMethods">非同期でアディティブなシーンをロードするメソッド</param>
+        static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, Func<AsyncOperation> loadSingleSceneAsyncMethod, Func<AsyncOperation[]> loadAdditiveSceneAsyncMethods)
         {
             if (IsLoadingSceneInSingleMode)
             {
@@ -77,10 +77,10 @@ namespace HvcNeoria.Unity.Utils
             }
 
             IsLoadingSceneInSingleMode = true;
-            AsyncOperation singleSceneOperation = getSingleSceneOperation();
+            AsyncOperation singleSceneOperation = loadSingleSceneAsyncMethod();
             singleSceneOperation.allowSceneActivation = false;
 
-            AsyncOperation[] additiveSceneOperations = getAdditiveSceneOperations();
+            AsyncOperation[] additiveSceneOperations = loadAdditiveSceneAsyncMethods();
 
             mono.Delay(waitForSeconds, () =>
             {
@@ -96,15 +96,17 @@ namespace HvcNeoria.Unity.Utils
         }
 
         /// <summary>
-        /// アクティブシーンの次のシーンのビルドインデックスを取得します。
-        /// 最後のシーンで実行すると、0を返します。
+        /// ビルドインデックス上で、このシーンの次のシーンを取得します。
+        /// このシーンが最後のシーンの場合は、最初のシーンを取得します。
         /// </summary>
-        public static int GetNextBuildIndex()
+        /// <param name="scene">シーン</param>
+        /// <returns>次のシーン</returns>
+        public static Scene GetNextScene(this Scene scene)
         {
-            int currentIndex = SceneManager.GetActiveScene().buildIndex;
+
             int lastIndex = SceneManager.sceneCountInBuildSettings - 1;
-            int index = currentIndex >= lastIndex ? 0 : currentIndex + 1;
-            return index;
+            var index = scene.buildIndex >= lastIndex ? 0 : scene.buildIndex + 1;
+            return SceneManager.GetSceneByBuildIndex(index);
         }
 
         /// <summary>
