@@ -8,6 +8,7 @@ namespace HvcNeoria.Unity.Utils
     [CreateAssetMenu]
     public class Master : ScriptableObject
     {
+        const string Path = "MasterData";
         public static Master I
         {
             get
@@ -24,8 +25,6 @@ namespace HvcNeoria.Unity.Utils
             }
         }
         private static Master _instance;
-        const string Path = "MasterData";
-
 
         [Header("Shop")]
         public CustomerSpawner customerSpawner;
