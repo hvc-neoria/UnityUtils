@@ -1,3 +1,6 @@
+using System;
+using UnityEngine;
+
 namespace HvcNeoria.Unity.Utils
 {
     public static class StringExtensions

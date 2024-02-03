@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace HvcNeoria.Unity.Utils
 {
     public static class SystemObjectExtensions
