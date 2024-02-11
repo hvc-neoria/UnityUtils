@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
-    public static class EtcExtensions
+    public static class ColorExtensions
     {
         /// <summary>
         /// カラーをHSVに変換する。
