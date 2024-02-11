@@ -19,6 +19,9 @@ namespace HvcNeoria.Unity.Utils
     {
         T[,] Value { get; set; }
 
+        public int XLength => Value.GetLength(0);
+        public int YLength => Value.GetLength(1);
+
         public T this[Vector2Int position]
         {
             get
