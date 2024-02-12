@@ -7,10 +7,20 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
+    /// <summary>
+    /// Spriteの形状のMeshを生成するためのエディタ拡張。
+    /// </summary>
+    /// <remarks>
+    /// Spriteの形状の当たり判定を実現するために作成した。
+    /// 使い方
+    /// ・プロジェクトビューでSpriteを選択（複数可）し右クリックする
+    /// ・GenerateMeshesFromSpritesを選択する
+    /// ・Meshesフォルダが生成され、その中にMeshが生成される
+    /// </remarks>
     public static class MeshGeneratorFromSprite
     {
         /// <summary>
-        /// コンテキストメニューで最下部に表示するための優先度の値。
+        /// コンテキストメニューで最下部に表示するための、優先度の値。
         /// </summary>
         const int PriorityForBottomInContextMenu = 200000;
 
@@ -41,7 +51,7 @@ namespace HvcNeoria.Unity.Utils
 
 
         /// <summary>
-        /// 選択されたオブジェクトが全てSpriteである場合、
+        /// 選択されたオブジェクトが全てSpriteである場合のみ、
         /// コンテキストメニューで<see cref="GenerateMeshesFromSprites"/>を使用可能にする。
         /// </summary>
         /// <returns>選択されたオブジェクトが全てSpriteの場合に、trueを返す。</returns>
@@ -55,8 +65,10 @@ namespace HvcNeoria.Unity.Utils
         }
 
         /// <summary>
-        /// Spriteが格納されているフォルダの兄弟フォルダとしてMeshesフォルダを作成するための、パスを生成する。
+        /// Meshを格納するフォルダのパスを生成する。
         /// </summary>
+        /// <remarks>
+        /// フォルダの位置は、Spriteが格納されているフォルダの兄弟関係となる位置。
         /// <param name="sprite">Sprite</param>
         /// <returns>Meshesフォルダを作成するためのパス</returns>
         static string GenerateMeshesFolderPath(this Sprite sprite)

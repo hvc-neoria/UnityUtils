@@ -13,11 +13,13 @@ using UnityEditor.SceneManagement;
 namespace HvcNeoria.Unity.Utils
 {
     /// <summary>
-    /// 全シーンのGameObjectを取得するクラス
+    /// 全シーンのGameObjectを取得するクラス。
     /// </summary>
-    public class GameObjectGetterOfAllScenes
+    /// <remarks>
+    /// PrefabInstanceOverrideScannerに使用している。
+    /// </remarks>
+    public static class GameObjectGetterOfAllScenes
     {
-
         //シーンの総数
         private static int _sceneNum = 0;
 

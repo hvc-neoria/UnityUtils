@@ -9,8 +9,8 @@ namespace HvcNeoria.Unity.Utils
     /// </summary>
     /// <remarks>
     /// 使い方
-    /// ・Unityの上部メニューバーの Tools > Scene Switcher をクリックする
-    /// ・切り替えたいシーンのボタンをクリックする
+    /// ・Unityの上部メニューバーの Tools > Scene Switcher を押下する
+    /// ・切り替えたいシーンのボタンを押下する
     /// </remarks>
     public class SceneSwitcher : EditorWindow
     {

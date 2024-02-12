@@ -5,10 +5,20 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
+    /// <summary>
+    /// ScriptableObjectを生成するエディタ拡張。
+    /// </summary>
+    /// <remarks>
+    /// 使い方
+    /// ・このクラスのIプロパティの下に必要なパラメーターを定義する
+    /// ・UnityのプロジェクトビューでResourcesフォルダを開き右クリックする
+    /// ・Create > Masterを押下する
+    /// ・Masterという名称のファイルがScriptableObject生成される
     [CreateAssetMenu]
     public class Master : ScriptableObject
     {
         const string Path = "MasterData";
+        private static Master _instance;
         public static Master I
         {
             get
@@ -24,8 +34,8 @@ namespace HvcNeoria.Unity.Utils
                 return _instance;
             }
         }
-        private static Master _instance;
 
+        // パラメーター定義の例
         [Header("Shop")]
         public CustomerSpawner customerSpawner;
         [Serializable]

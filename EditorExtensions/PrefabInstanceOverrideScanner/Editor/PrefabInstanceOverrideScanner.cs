@@ -6,8 +6,13 @@ using UnityEditor;
 namespace HvcNeoria.Unity.Utils
 {
     /// <summary>
-    /// プレハブインスタンスのオーバーライドを走査するクラス
+    /// 全シーンの全ゲームオブジェクトからプレハブインスタンスのオーバーライドを走査するエディタ拡張。
     /// </summary>
+    /// <remarks>
+    /// 使い方
+    /// ・Unityの上部メニューバーの Tools > Prefab Instance Override Scan を押下する
+    /// ・Consoleウィンドウにオーバーライドがあるプレハブインスタンスの情報が表示される
+    /// </remarks>
     public class PrefabInstanceOverrideScanner : MonoBehaviour
     {
         [MenuItem("Tools/Prefab Instance Override Scan")]
