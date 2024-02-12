@@ -6,7 +6,7 @@ namespace HvcNeoria.Unity.Utils
 {
     // 個人的に遅延処理はCoroutineかDOTweenが使いやすい。
     // 参考：https://12px.com/blog/2016/11/unity-delay/
-    public static class CoroutineUtils
+    public static class CoroutineExtensions
     {
         /// <summary>
         /// 指定時間後にactionを実行する。

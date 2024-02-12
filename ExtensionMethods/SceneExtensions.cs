@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace HvcNeoria.Unity.Utils
 {
-    public static class SceneUtils
+    public static class SceneExtensions
     {
         /// <summary>
         /// アクティブシーンのビルドインデックスを取得します。

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
-    public static class ComponentUtils
+    public static class ComponentExtensions
     {
         /// <summary>
         /// コンポーネント取得失敗時に例外を出力するGetComponent。
