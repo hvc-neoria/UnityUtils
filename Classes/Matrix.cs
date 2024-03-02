@@ -17,20 +17,33 @@ namespace HvcNeoria.Unity.Utils
     /// <typeparam name="T">任意の型</typeparam>
     public class Matrix<T>
     {
-        T[,] Value { get; set; }
+        public readonly T[,] Value;
 
+        public int Length => XLength * YLength;
         public int XLength => Value.GetLength(0);
         public int YLength => Value.GetLength(1);
 
-        public T this[Vector2Int position]
+        public T this[int x, int y]
         {
             get
             {
-                return Value[position.x, position.y];
+                return Value[x, y];
             }
             set
             {
-                Value[position.x, position.y] = value;
+                Value[x, y] = value;
+            }
+        }
+
+        public T this[Vector2Int index]
+        {
+            get
+            {
+                return Value[index.x, index.y];
+            }
+            set
+            {
+                Value[index.x, index.y] = value;
             }
         }
 
@@ -57,6 +70,32 @@ namespace HvcNeoria.Unity.Utils
                 for (int y = 0; y < size.y; y++)
                 {
                     newArray[x, y] = Value[index.x + x, index.y + y];
+                }
+            }
+            return new Matrix<T>(newArray);
+        }
+
+        /// <summary>
+        /// 置き換える。
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="rectangleInt"></param>
+        /// <returns></returns>
+        public Matrix<T> Replace(T value, RectangleInt rectangleInt)
+        {
+            T[,] newArray = new T[XLength, YLength];
+            for (int x = 0; x < XLength; x++)
+            {
+                for (int y = 0; y < YLength; y++)
+                {
+                    if (x >= rectangleInt.LocalLeft && x <= rectangleInt.LocalRight && y >= rectangleInt.LocalBottom && y <= rectangleInt.LocalTop)
+                    {
+                        newArray[x, y] = value;
+                    }
+                    else
+                    {
+                        newArray[x, y] = Value[x, y];
+                    }
                 }
             }
             return new Matrix<T>(newArray);
