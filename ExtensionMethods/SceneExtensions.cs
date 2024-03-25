@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 namespace HvcNeoria.Unity.Utils
 {
+    /// <summary>
+    /// メソッドの引数をSceneにしたかったが、
+    /// ビルドインデックスまたはシーン名からロードしていないSceneを取得できないため、
+    /// ビルドインデックスに統一した。
+    /// </summary>
     public static class SceneExtensions
     {
         /// <summary>
@@ -32,28 +37,28 @@ namespace HvcNeoria.Unity.Utils
         /// </remarks>
         /// <param name="mono">MonoBehaviour。コルーチンの実行に必要。</param>
         /// <param name="waitForSeconds">待ち時間（秒）</param>
-        /// <param name="singleScene">シングルモードでロードするシーン</param>
-        /// <param name="additiveScenes">アディティブモードでロードするシーン</param>
-        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, Scene singleScene, params Scene[] additiveScenes)
+        /// <param name="singleSceneBuildIndex">シングルモードでロードするシーンのビルドインデックス</param>
+        /// <param name="additiveSceneBuildIndexes">アディティブモードでロードするシーンのビルドインデックス</param>
+        public static void ActivateSceneAfter(this MonoBehaviour mono, float waitForSeconds, int singleSceneIndex, params int[] additiveSceneIndexes)
         {
             mono.ActivateSceneAfter(
                 waitForSeconds,
-                () => SceneManager.LoadSceneAsync(singleScene.buildIndex, LoadSceneMode.Single),
-                () => GetAdditiveSceneOperations(additiveScenes)
+                () => SceneManager.LoadSceneAsync(singleSceneIndex, LoadSceneMode.Single),
+                () => GetAdditiveSceneOperations(additiveSceneIndexes)
             );
         }
 
         /// <summary>
         /// ロードシーンモードがアディティブな複数のシーンをロードします。
         /// </summary>
-        /// <param name="additiveScenes">アディティブシーン</param>
-        /// <returns>AsyncOperation配列</returns>
-        static AsyncOperation[] GetAdditiveSceneOperations(Scene[] additiveScenes)
+        /// <param name="additiveSceneIndexes">ビルドインデックス</param>
+        /// <returns></returns>
+        static AsyncOperation[] GetAdditiveSceneOperations(int[] additiveSceneIndexes)
         {
-            var additiveSceneOperations = new AsyncOperation[additiveScenes.Length];
-            for (int i = 0; i < additiveScenes.Length; i++)
+            AsyncOperation[] additiveSceneOperations = new AsyncOperation[additiveSceneIndexes.Length];
+            for (int i = 0; i < additiveSceneIndexes.Length; i++)
             {
-                additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveScenes[i].buildIndex, LoadSceneMode.Additive);
+                additiveSceneOperations[i] = SceneManager.LoadSceneAsync(additiveSceneIndexes[i], LoadSceneMode.Additive);
             }
             return additiveSceneOperations;
         }
@@ -96,17 +101,15 @@ namespace HvcNeoria.Unity.Utils
         }
 
         /// <summary>
-        /// ビルドインデックス上で、このシーンの次のシーンを取得します。
-        /// このシーンが最後のシーンの場合は、最初のシーンを取得します。
+        /// アクティブシーンの次のシーンのビルドインデックスを取得します。
+        /// 最後のシーンで実行すると、0を返します。
         /// </summary>
-        /// <param name="scene">シーン</param>
-        /// <returns>次のシーン</returns>
-        public static Scene GetNextScene(this Scene scene)
+        /// <param name="buildIndex">ビルドインデックス</param>
+        /// <returns>次のビルドインデックス</returns>
+        public static int GetNextBuildIndex(int buildIndex)
         {
-
             int lastIndex = SceneManager.sceneCountInBuildSettings - 1;
-            var index = scene.buildIndex >= lastIndex ? 0 : scene.buildIndex + 1;
-            return SceneManager.GetSceneByBuildIndex(index);
+            return buildIndex >= lastIndex ? 0 : buildIndex + 1;
         }
 
         /// <summary>
@@ -123,6 +126,25 @@ namespace HvcNeoria.Unity.Utils
                 SceneManager.sceneLoaded -= DoOnce;
                 action();
             }
+        }
+
+        /// <summary>
+        /// 同名のシーンが存在する場合、ビルドインデックスが若い方を返します。
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <returns></returns>
+        public static int ToBuildIndex(string sceneName)
+        {
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            {
+                // シーン名を抽出
+                var fileName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i));
+                if (sceneName == fileName)
+                {
+                    return i;
+                }
+            }
+            throw new ArgumentException($"シーン名 {sceneName} が見つかりませんでした。");
         }
     }
 }
