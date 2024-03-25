@@ -100,5 +100,21 @@ namespace HvcNeoria.Unity.Utils
             }
             return new Matrix<T>(newArray);
         }
+
+        /// <summary>
+        /// IEnumerableを取得する。
+        /// </summary>
+        /// <returns>IEnumerable<T></returns>
+        public IEnumerable<T> GetIEnumerable()
+        {
+            for (int x = 0; x < XLength; x++)
+            {
+                for (int y = 0; y < YLength; y++)
+                {
+                    yield return Value[x, y];
+                }
+            }
+        }
+
     }
 }
