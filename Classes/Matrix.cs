@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace HvcNeoria.Unity.Utils
 {
@@ -116,5 +117,25 @@ namespace HvcNeoria.Unity.Utils
             }
         }
 
+        /// <summary>
+        /// 引数と同じ値を持つ要素のインデックスを取得する。
+        /// </summary>
+        /// <param name="value">値</param>
+        /// <returns>Vector2Int</returns>
+        public Vector2Int IndexOf(T value)
+        {
+            for (int x = 0; x < XLength; x++)
+            {
+                for (int y = 0; y < YLength; y++)
+                {
+                    if (value != null && Value[x, y] == null) continue;
+                    if (Value[x, y].Equals(value))
+                    {
+                        return new Vector2Int(x, y);
+                    }
+                }
+            }
+            throw new ArgumentException("Not found.");
+        }
     }
 }
