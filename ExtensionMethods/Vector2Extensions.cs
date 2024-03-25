@@ -9,6 +9,8 @@ namespace HvcNeoria.Unity.Utils
     {
         public static Vector3 ToXOZ(this Vector2 vector2) => new Vector3(vector2.x, 0, vector2.y);
 
+        public static Vector2Int ToVector2Int(this Vector2 vector2) => new Vector2Int((int)vector2.x, (int)vector2.y);
+
         /// <summary>
         /// ゲームコントローラーの浅い斜め入力に対応したノーマライズ。
         /// XとYに0.5fを渡すと、XとYに約0.35fを返す。
@@ -21,6 +23,22 @@ namespace HvcNeoria.Unity.Utils
             float yLength = Mathf.Abs(vector2.y);
             float scale = Mathf.Max(xLength, yLength);
             return vector2.normalized * scale;
+        }
+
+        /// <summary>
+        /// UnityのInput.GetAxisRawのように、Vector2を変換する。
+        /// </summary>
+        /// <remarks>
+        /// -1, 0, 1のいずれかを返す。
+        /// </remarks>
+        /// <param name="vector2">Vector2</param>
+        /// <returns>Vector2Int</returns>
+        public static Vector2Int ToAxisRaw(this Vector2 vector2)
+        {
+            return new Vector2Int(
+                vector2.x > 0 ? 1 : vector2.x < 0 ? -1 : 0,
+                vector2.y > 0 ? 1 : vector2.y < 0 ? -1 : 0
+            );
         }
 
         /// <summary>
