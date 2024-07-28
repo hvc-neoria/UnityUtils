@@ -167,7 +167,6 @@ namespace HvcNeoria.Unity.Utils
             return self.GetComponentsInChildren<TComponent>().Where(v => self.gameObject != v.gameObject).ToArray();
         }
 
-
         /// <summary>
         /// 指定されたインターフェイスを実装したコンポーネントを持つオブジェクトを検索します。
         /// </summary>
