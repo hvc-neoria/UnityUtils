@@ -65,12 +65,18 @@ namespace HvcNeoria.Unity.Utils
         /// <returns></returns>
         public Matrix<T> SubMatrix(Vector2Int index, Vector2Int size)
         {
-            T[,] newArray = new T[size.x, size.y];
-            for (int x = 0; x < size.x; x++)
+            var xLength = size.x + Mathf.Min(index.x, 0);
+            var yLength = size.y + Mathf.Min(index.y, 0);
+            T[,] newArray = new T[xLength, yLength];
+
+            var xOrigin = Mathf.Max(index.x, 0);
+            var yOrigin = Mathf.Max(index.y, 0);
+
+            for (int x = 0; x < xLength; x++)
             {
-                for (int y = 0; y < size.y; y++)
+                for (int y = 0; y < yLength; y++)
                 {
-                    newArray[x, y] = Value[index.x + x, index.y + y];
+                    newArray[x, y] = Value[xOrigin + x, yOrigin + y];
                 }
             }
             return new Matrix<T>(newArray);
