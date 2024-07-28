@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace HvcNeoria.Unity.Utils
 {
+    /// <summary>
+    /// 長方形の位置とサイズを表す構造体。
+    /// </summary>
     public struct RectangleInt : IRectangleInt
     {
         /// <summary>
@@ -45,6 +48,11 @@ namespace HvcNeoria.Unity.Utils
             Position = position;
             Size = size;
             LocalPosition = position - parentPosition;
+        }
+
+        public bool Contains(Vector2Int point)
+        {
+            return Left <= point.x && point.x <= Right && Bottom <= point.y && point.y <= Top;
         }
     }
 }
