@@ -19,6 +19,7 @@ namespace HvcNeoria.Unity.Utils
         private int packagingModeIndex;
         // パッケージングモードがディレクトリモードのときに参照するパス
         private string rootPathOnDirectoryMode;
+        private string[] baseClassNamesWithoutArrow = new string[]{"MonoBehaviour" };
 
         /// <summary>
         /// Unity上部メニューに追加された項目を押下時にウインドウを表示する。
@@ -132,12 +133,7 @@ namespace HvcNeoria.Unity.Utils
                         classInfo.Interfaces.Add(CleanClassName(iface.Name));
                     }
 
-                    var bindingFlags = BindingFlags.Public | BindingFlags.Instance;
-
-                    if (isGeneratingPrivate)
-                    {
-                        bindingFlags |= BindingFlags.NonPublic;
-                    }
+                    var bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
 
                     // フィールドを解析
                     foreach (var field in type.GetFields(bindingFlags))
@@ -244,7 +240,7 @@ namespace HvcNeoria.Unity.Utils
             }
         }
 
-        private static void WriteClassesOf(Namespace rootNamespace, IEnumerable<ClassInfo> allClasses, StreamWriter writer)
+        private void WriteClassesOf(Namespace rootNamespace, IEnumerable<ClassInfo> allClasses, StreamWriter writer)
         {
             foreach (var item in rootNamespace.Items)
             {
@@ -261,15 +257,38 @@ namespace HvcNeoria.Unity.Utils
                 if (c != null)
                 {
                     // itemがclassなら、描画
-                    writer.WriteLine($"class {c.Name} {{");
+
+                    string baseClasses = "";
+                    foreach (var baseClass in c.BaseClasses)
+                    {
+                        if (baseClassNamesWithoutArrow.Contains(baseClass))
+                        {
+                            baseClasses += $"{baseClass}";
+                        }
+                    }
+
+                    string stereoTypeStart = baseClasses.Any() ? " <<" : "";
+                    string stereoTypeEnd = baseClasses.Any() ? ">>" : "";
+
+                    writer.WriteLine($"class {c.Name}{stereoTypeStart}{baseClasses}{stereoTypeEnd} {{");
 
                     foreach (var field in c.Fields)
                     {
+                        if (!isGeneratingPrivate && field.Accessibility.Type == Accessibility.Types.Private)
+                        {
+                            continue;
+                        }
+
                         writer.WriteLine($"  {field.Accessibility.ToSymbol()} {field.Type} {field.Name}");
                     }
 
                     foreach (var prop in c.Properties)
                     {
+                        if (!isGeneratingPrivate && prop.Accessibility.Type == Accessibility.Types.Private)
+                        {
+                            continue;
+                        }
+
                         var getter = prop.CanGet ? $"{prop.GetterAccessibility} get; " : "";
                         var setter = prop.CanSet ? $"{prop.SetterAccessibility} set; " : "";
                         writer.WriteLine($"  {{method}}{prop.Accessibility.ToSymbol()} {prop.Type} {prop.Name} {{{getter}{setter}}}");
@@ -277,6 +296,11 @@ namespace HvcNeoria.Unity.Utils
 
                     foreach (var method in c.Methods)
                     {
+                        if (!isGeneratingPrivate && method.Accessibility.Type == Accessibility.Types.Private)
+                        {
+                            continue;
+                        }
+
                         writer.WriteLine($"  {method.Accessibility.ToSymbol()} {method.Type} {method.Name}()");
                     }
 
@@ -284,12 +308,17 @@ namespace HvcNeoria.Unity.Utils
 
                     foreach (var baseClass in c.BaseClasses)
                     {
-                        writer.WriteLine($"{c.Name} --|> {baseClass}");
+                        if (baseClassNamesWithoutArrow.Contains(baseClass))
+                        {
+                            continue;
+                        }
+
+                        writer.WriteLine($"{c.Name} -up-|> {baseClass}");
                     }
 
                     foreach (var iface in c.Interfaces)
                     {
-                        writer.WriteLine($"{c.Name} ..|> {iface}");
+                        writer.WriteLine($"{c.Name} .up.|> {iface}");
                     }
 
                     foreach (var dependency in c.Dependencies)
